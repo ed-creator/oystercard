@@ -24,17 +24,10 @@ describe Oystercard do
     end
 
     it "To protect the user the card should have a maxium of £90" do
-      maximum_balance = described_class::MAXIMUM_LIMIT
+      maximum_balance = described_class::MAX_LIMIT
       message = "Error: Maximum of £#{maximum_balance} stored on card"
       oystercard.top_up(maximum_balance)
       expect{oystercard.top_up(1)}.to raise_error message
-    end
-  end
-
-  describe '#deduct' do
-    it 'deducts fare from the card balance' do
-      oystercard.top_up(15)
-      expect {oystercard.deduct(10)}.to change{oystercard.balance}.by -10
     end
   end
 
@@ -47,7 +40,8 @@ describe Oystercard do
 
   describe '#touch_in' do
     it 'expects touch_in to change in_journey? to true' do
-      oystercard.top_up(20)
+      min_charge = described_class::MIN_CHARGE
+      oystercard.top_up(min_charge)
       oystercard.touch_in
       expect(oystercard.in_journey?).to eq true
     end
@@ -59,10 +53,18 @@ describe Oystercard do
 
   describe '#touch_out' do
     it 'expects touch_out to change in_journey? to false' do
+      min_charge = described_class::MIN_CHARGE
       oystercard.top_up(30)
       oystercard.touch_in
       oystercard.touch_out
       expect(oystercard.in_journey?).to eq false
+    end
+
+    it 'checks touch_out deducts balance by fare' do
+      min_charge = described_class::MIN_CHARGE
+      oystercard.top_up(30)
+      oystercard.touch_in
+      expect{oystercard.touch_out}.to change{oystercard.balance}.by -min_charge
     end
   end
 

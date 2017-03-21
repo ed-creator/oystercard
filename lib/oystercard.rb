@@ -3,7 +3,8 @@ class Oystercard
 
   attr_reader :balance, :in_journey
 
-  MAXIMUM_LIMIT = 90
+  MAX_LIMIT = 90
+  MIN_CHARGE = 1
 
   def initialize()
     @balance = 0
@@ -20,17 +21,13 @@ class Oystercard
   end
 
   def touch_out
+    deduct(MIN_CHARGE)
     self.in_journey = false
   end
 
-
   def top_up(amount)
-    fail "Error: Maximum of £#{MAXIMUM_LIMIT} stored on card" if over_limit?(amount)
+    fail "Error: Maximum of £#{MAX_LIMIT} stored on card" if over_limit?(amount)
     self.balance += amount
-  end
-
-  def deduct(fare)
-    self.balance -= fare
   end
 
   private
@@ -38,11 +35,15 @@ class Oystercard
   attr_writer :balance, :in_journey
 
   def over_limit?(amount)
-    (balance + amount) > MAXIMUM_LIMIT
+    (balance + amount) > MAX_LIMIT
   end
 
   def min_balance?
-    balance >= 1
+    balance >= MIN_CHARGE
+  end
+
+  def deduct(fare)
+    self.balance -= fare
   end
 
 end
