@@ -16,8 +16,14 @@ describe Oystercard do
     end
     it 'can top up the balance' do
     expect{ oystercard.top_up 1 }.to change{ oystercard.return_balance }.by 1
-  end
+    end
 
+    it "To protect the user the card should have a maxium of £90" do
+      maximum_balance = described_class::MAXIMUM_LIMIT
+      message = "Error: Maximum of £#{maximum_balance} stored on card"
+      oystercard.top_up(maximum_balance)
+      expect {oystercard.top_up(1)}.to raise_error message
+    end
   end
 
 
