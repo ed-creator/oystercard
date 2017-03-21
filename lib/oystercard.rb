@@ -24,12 +24,10 @@ class Oystercard
 
   private
 
+  attr_writer :balance
+
   def over_limit?(amount)
     (balance + amount) > MAXIMUM_LIMIT
   end
-
-  attr_writer :balance
-
-
 
 end
