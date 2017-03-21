@@ -25,6 +25,11 @@ describe Oystercard do
       expect {oystercard.top_up(1)}.to raise_error message
     end
   end
-
+  describe '#deduct' do
+    it 'deducts fare from the card balance' do
+      oystercard.top_up(15)
+      expect { oystercard.deduct 10 }.to change{ oystercard.balance}.by -10
+    end
+  end
 
 end

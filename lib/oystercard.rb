@@ -18,6 +18,10 @@ class Oystercard
     self.balance += amount
   end
 
+  def deduct(fare)
+    self.balance -= fare
+  end
+
   private
 
   def over_limit?(amount)
