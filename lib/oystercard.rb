@@ -36,11 +36,11 @@ class Oystercard
   attr_writer :balance, :entry_station
 
   def journey_compiler(entry_station, exit_station)
-    self.journey_history << {entry_station => exit_station}
+    journey_history << {entry_station => exit_station}
   end
 
   def over_limit?(amount)
-    (balance + amount) > MAX_LIMIT
+    balance + amount > MAX_LIMIT
   end
 
   def min_balance?
