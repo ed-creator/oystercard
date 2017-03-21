@@ -12,6 +12,10 @@ describe Oystercard do
     it 'card is initially not in a journey' do
       expect(oystercard).not_to be_in_journey
     end
+
+    it 'checks card has an empty list of journeys by default' do
+      expect(oystercard.journey_history).to be_empty
+    end
   end
 
   describe '#top_up' do
@@ -60,31 +64,37 @@ describe Oystercard do
   end
 
   describe '#touch_out' do
+    before do
+      oystercard.top_up(described_class::MIN_CHARGE)
+    end
+
     it 'expects touch_out to change in_journey? to false' do
-      min_charge = described_class::MIN_CHARGE
-      oystercard.top_up(30)
       oystercard.touch_in(station)
-      oystercard.touch_out
+      oystercard.touch_out(station)
       expect(oystercard.in_journey?).to eq false
     end
 
     it 'checks touch_out deducts balance by fare' do
       min_charge = described_class::MIN_CHARGE
-      oystercard.top_up(30)
       oystercard.touch_in(station)
-      expect{oystercard.touch_out}.to change{oystercard.balance}.by -min_charge
+      expect{oystercard.touch_out(station)}.to change{oystercard.balance}.by -min_charge
     end
 
     it 'checks touch_out sets entry_station to nil' do
-      min_charge = described_class::MIN_CHARGE
-      oystercard.top_up(min_charge)
       oystercard.touch_in(station)
-      expect{oystercard.touch_out}.to change{oystercard.entry_station}.to nil
-
+      expect{oystercard.touch_out(station)}.to change{oystercard.entry_station}.to nil
     end
   end
 
-
-
+  context 'Oystercard already in journey' do
+    before do
+      oystercard.top_up(described_class::MIN_CHARGE)
+      oystercard.touch_in(station)
+    end
+    it 'checks touching in, then touching out, creates one journey' do
+      oystercard.touch_out(station)
+      expect(oystercard.journey_history.length).to eq 1
+    end
+  end
 
 end
