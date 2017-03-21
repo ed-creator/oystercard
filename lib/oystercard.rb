@@ -1,28 +1,27 @@
 
 class Oystercard
 
-  attr_reader :balance, :in_journey
+  attr_reader :balance, :entry_station
 
   MAX_LIMIT = 90
   MIN_CHARGE = 1
 
   def initialize()
     @balance = 0
-    @in_journey = false
   end
 
   def in_journey?
-    in_journey
+    entry_station != nil
   end
 
-  def touch_in
+  def touch_in(station)
     fail "Insufficient Balance" unless min_balance?
-    self.in_journey = true
+    self.entry_station = station
   end
 
   def touch_out
     deduct(MIN_CHARGE)
-    self.in_journey = false
+    self.entry_station = nil
   end
 
   def top_up(amount)
@@ -32,7 +31,7 @@ class Oystercard
 
   private
 
-  attr_writer :balance, :in_journey
+  attr_writer :balance, :entry_station
 
   def over_limit?(amount)
     (balance + amount) > MAX_LIMIT

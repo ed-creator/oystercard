@@ -2,6 +2,7 @@ require 'oystercard'
 
 describe Oystercard do
   subject(:oystercard)  {described_class.new}
+  let(:station) {double :station}
 
   describe '#initialize' do
     it "card initialized with 0 balance" do
@@ -38,16 +39,23 @@ describe Oystercard do
     end
   end
 
-  describe '#touch_in' do
-    it 'expects touch_in to change in_journey? to true' do
+  describe '#touch_in(station)' do
+    it 'expects touch_in(station) to change in_journey? to true' do
       min_charge = described_class::MIN_CHARGE
       oystercard.top_up(min_charge)
-      oystercard.touch_in
+      oystercard.touch_in(station)
       expect(oystercard.in_journey?).to eq true
     end
 
     it 'checks the user has over the minimum balance' do
-      expect{oystercard.touch_in}.to raise_error "Insufficient Balance"
+      expect{oystercard.touch_in(station)}.to raise_error "Insufficient Balance"
+    end
+
+    it 'checks card knows the entry station after touch_in(station)' do
+      min_charge = described_class::MIN_CHARGE
+      oystercard.top_up(min_charge)
+      oystercard.touch_in(station)
+      expect(oystercard.entry_station).to eq station
     end
   end
 
@@ -55,7 +63,7 @@ describe Oystercard do
     it 'expects touch_out to change in_journey? to false' do
       min_charge = described_class::MIN_CHARGE
       oystercard.top_up(30)
-      oystercard.touch_in
+      oystercard.touch_in(station)
       oystercard.touch_out
       expect(oystercard.in_journey?).to eq false
     end
@@ -63,9 +71,20 @@ describe Oystercard do
     it 'checks touch_out deducts balance by fare' do
       min_charge = described_class::MIN_CHARGE
       oystercard.top_up(30)
-      oystercard.touch_in
+      oystercard.touch_in(station)
       expect{oystercard.touch_out}.to change{oystercard.balance}.by -min_charge
     end
+
+    it 'checks touch_out sets entry_station to nil' do
+      min_charge = described_class::MIN_CHARGE
+      oystercard.top_up(min_charge)
+      oystercard.touch_in(station)
+      expect{oystercard.touch_out}.to change{oystercard.entry_station}.to nil
+
+    end
   end
+
+
+
 
 end
