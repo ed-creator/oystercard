@@ -15,6 +15,7 @@ class Oystercard
   end
 
   def touch_in
+    fail "Insufficient Balance" unless min_balance?
     self.in_journey = true
   end
 
@@ -22,9 +23,6 @@ class Oystercard
     self.in_journey = false
   end
 
-  def return_balance
-    balance
-  end
 
   def top_up(amount)
     fail "Error: Maximum of £#{MAXIMUM_LIMIT} stored on card" if over_limit?(amount)
@@ -41,6 +39,10 @@ class Oystercard
 
   def over_limit?(amount)
     (balance + amount) > MAXIMUM_LIMIT
+  end
+
+  def min_balance?
+    balance >= 1
   end
 
 end
